@@ -111,7 +111,7 @@ pub mod net {
 	}
 	impl network {
 		fn construct_shape(mut self) -> Vec<Vec<Rc<neuron>>> {
-
+			
 		}
 	}
 }
