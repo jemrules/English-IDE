@@ -1,3 +1,5 @@
+![classdiagram](https://raw.githubusercontent.com/jemrules/English-IDE/main/readmeAssets/classdiagram_dark.png#gh-dark-mode-only)
+![classdiagram](https://raw.githubusercontent.com/jemrules/English-IDE/main/readmeAssets/classdiagram_light.png#gh-light-mode-only)
 ## What is English IDE?
 English IDE is just like a programming IDE, but it gives you grammer errors and spelling errors. It will also be able to eventually have auto-complete for the rest of the sentence. *Sentence auto-complete may only be finished after individual projects end.*
 
