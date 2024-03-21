@@ -1,4 +1,3 @@
-use std::rc::Rc;
 // Activation Functions
 pub mod active_funcs {
 	pub fn get_from_string(s: &str) -> fn(f32) -> f32 {
@@ -83,6 +82,21 @@ pub struct neuron {
 	pub w_derivs: Vec<f32>,
 	pub b_deriv: f32,
 }
+impl Default for neuron {
+	fn default() -> neuron {
+		neuron {
+			weights: vec![],
+			bias: 0.0,
+			activation: active_funcs::get_from_string("linear"),
+			activation_deriv: active_funcs::get_deriv_from_string("linear"),
+
+			value: 0.0,
+			t_len: 0,
+			w_derivs: vec![],
+			b_deriv: 0.0,
+		}
+	}
+}
 
 impl neuron{
 	pub fn f_prop(mut self,pre_layer: Vec<f32>) {
@@ -96,22 +110,30 @@ impl neuron{
 
 // Network
 pub mod net {
+	use crate::neuron;
 	pub struct network {
 		// amount, active_type
 		pub shape: Vec<(u16,String)>,
-		pub model: Vec<Vec<Rc<neuron>>>,
+		pub model: Vec<Vec<neuron>>,
 	}
 	impl Default for network {
 		fn default() -> network {
 			network {
-				shape: Vec![(0,"linear".to_string()),(0,"sigmoid".to_string())],
+				shape: vec![(0,"linear".to_string()),(0,"sigmoid".to_string())],
 				model: Vec::new(),
 			}
 		}
 	}
 	impl network {
-		fn construct_shape(mut self) -> Vec<Vec<Rc<neuron>>> {
-			
+		fn construct_shape(mut self) -> Vec<Vec<neuron>> {
+			for layer in 0..self.shape.len() {
+				let mut c_layer: Vec<neuron> = Vec::new();
+				for _ in 0..self.shape[layer].0 {
+					c_layer.push(neuron {weights: vec![1.0,1.0], ..Default::default()});
+				}
+				self.model.push(c_layer);
+			}
+			return self.model;
 		}
 	}
 }

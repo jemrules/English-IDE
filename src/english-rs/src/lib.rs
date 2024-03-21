@@ -23,7 +23,7 @@ fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResu
         w_derivs: vec![0.0],
         b_deriv: 0.0,
     };
-    Ok("Neuron Outputed Value: ".to_string() + &n.value.to_string() + "\n" + "Neuron Bias: " + &n.bias.to_string())
+    Ok(("Activation: ").to_string())
 }
 
 
