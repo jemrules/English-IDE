@@ -6,6 +6,8 @@ use crate::neural_network::neuron;
 use crate::neural_network::active_funcs::get_from_string;
 use crate::neural_network::active_funcs::get_deriv_from_string;
 
+// "../../.venv/Scripts/activate.bat"
+
 /// Formats the sum of two numbers as string.
 // #[pyfunction]
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
