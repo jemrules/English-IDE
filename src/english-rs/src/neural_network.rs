@@ -94,8 +94,13 @@ pub mod net {
 		fn construct_shape(mut self) -> Vec<Vec<neuron>> {
 			for layer in 0..self.shape.len() {
 				let mut c_layer: Vec<neuron> = Vec::new();
-				for _ in 0..self.shape[layer].0 {
-					c_layer.push(neuron {weights: vec![1.0,1.0], ..Default::default()});
+				for n in 0..self.shape[layer].0 {
+					if n == 0 {
+						c_layer.push(neuron {weights: vec![], ..Default::default()});
+					}
+					else {
+						c_layer.push(neuron {weights: self.model[(n-1) as u16].iter().map(|m| m.value).copied().collect(), ..Default::default()});
+					}
 				}
 				self.model.push(c_layer);
 			}
