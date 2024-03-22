@@ -20,54 +20,20 @@ pub mod active_funcs {
 			_ => panic!("Invalid Activation Function Derivative"),
 		}
 	}
+	pub fn linear(x: f32) -> f32 {x}
+	pub fn linear_deriv(x: f32) -> f32 {1.0}
 
+	pub fn sigmoid(x: f32) -> f32 {1.0 / (1.0 + (-x).exp())}
+	pub fn sigmoid_deriv(x: f32) -> f32 {sigmoid(x) * (1.0 - sigmoid(x))}
 
-	pub fn linear(x: f32) -> f32 {
-		x
-	}
-	pub fn linear_deriv(x: f32) -> f32 {
-		1.0
-	}
-	pub fn sigmoid(x: f32) -> f32 {
-		1.0 / (1.0 + (-x).exp())
-	}
-	pub fn sigmoid_deriv(x: f32) -> f32 {
-		sigmoid(x) * (1.0 - sigmoid(x))
-	}
-	pub fn relu(x: f32) -> f32 {
-		if x > 0.0 {
-			x
-		} else {
-			0.0
-		}
-	}
-	pub fn relu_deriv(x: f32) -> f32 {
-		if x > 0.0 {
-			1.0
-		} else {
-			0.0
-		}
-	}
-	pub fn leaky_relu(x: f32) -> f32 {
-		if x > 0.0 {
-			x
-		} else {
-			0.01 * x
-		}
-	}
-	pub fn leaky_relu_deriv(x: f32) -> f32 {
-		if x > 0.0 {
-			1.0
-		} else {
-			0.01
-		}
-	}
-	pub fn tanh(x: f32) -> f32 {
-		x.tanh()
-	}
-	pub fn tanh_deriv(x: f32) -> f32 {
-		1.0 - tanh(x).powi(2)
-	}
+	pub fn relu(x: f32) -> f32 {if x > 0.0 {x} else {0.0}}
+	pub fn relu_deriv(x: f32) -> f32 {if x > 0.0 {1.0} else {0.0}}
+
+	pub fn leaky_relu(x: f32) -> f32 {if x > 0.0 {x} else {0.01 * x}}
+	pub fn leaky_relu_deriv(x: f32) -> f32 {if x > 0.0 {1.0} else {0.01}}
+
+	pub fn tanh(x: f32) -> f32 {x.tanh()}
+	pub fn tanh_deriv(x: f32) -> f32 {1.0 - tanh(x).powi(2)}
 }
 
 // Neuron
