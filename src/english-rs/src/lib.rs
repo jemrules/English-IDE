@@ -33,7 +33,7 @@ fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResu
         shape: vec![(5,"linear".to_string()),(5,"sigmoid".to_string())],
         model: Vec::new(),
     };
-    netw.construct_shape();
+    netw.model=netw.construct_shape();
     Ok((netw.shape.iter().map(|a| a.1.clone()).collect::<Vec<String>>().join(" ")).to_string())
 }
 

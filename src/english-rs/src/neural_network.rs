@@ -91,21 +91,21 @@ pub mod net {
 		}
 	}
 	impl network {
-		pub fn construct_shape(&mut self){// -> Vec<Vec<neuron>> {
-			self.model = Vec::new();
+		pub fn construct_shape(&mut self) -> Vec<Vec<neuron>> {
+			let mut model:Vec<Vec<neuron>> = Vec::new();
 			for layer in 0..self.shape.len() {
 				let mut c_layer: Vec<neuron> = Vec::new();
 				for n in 0..self.shape[layer].0 {
 					if n == 0 {
 						c_layer.push(neuron {weights: vec![], ..Default::default()});
 					} else {
-						c_layer.push(neuron {weights: self.model[(n-1) as usize].iter().map(|m| m.value).collect(), ..Default::default()});
+						c_layer.push(neuron {weights: model[(n-1) as usize].iter().map(|m| m.value).collect(), ..Default::default()});
 					}
 				}
 				println!("{}",c_layer.len());
-				self.model.push(c_layer);
+				model.push(c_layer);
 			}
-			return;// self.model;
+			return model;
 		}
 	}
 }
