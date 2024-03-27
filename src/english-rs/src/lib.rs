@@ -30,7 +30,7 @@ fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResu
     //     b_deriv: 0.0,
     // };
     let mut netw = net::network {
-        shape: vec![(0,"linear".to_string()),(0,"sigmoid".to_string())],
+        shape: vec![(5,"linear".to_string()),(5,"sigmoid".to_string())],
         model: Vec::new(),
     };
     netw.construct_shape();
