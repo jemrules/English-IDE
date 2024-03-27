@@ -91,7 +91,8 @@ pub mod net {
 		}
 	}
 	impl network {
-		pub fn construct_shape(mut self) -> Vec<Vec<neuron>> {
+		pub fn construct_shape(&mut self){// -> Vec<Vec<neuron>> {
+			self.model = Vec::new();
 			for layer in 0..self.shape.len() {
 				let mut c_layer: Vec<neuron> = Vec::new();
 				for n in 0..self.shape[layer].0 {
@@ -101,9 +102,10 @@ pub mod net {
 						c_layer.push(neuron {weights: self.model[(n-1) as usize].iter().map(|m| m.value).collect(), ..Default::default()});
 					}
 				}
+				println!("{}",c_layer.len());
 				self.model.push(c_layer);
 			}
-			return self.model;
+			return;// self.model;
 		}
 	}
 }

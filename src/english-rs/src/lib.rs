@@ -8,7 +8,9 @@ use crate::neural_network::active_funcs::get_from_string;
 use crate::neural_network::active_funcs::get_deriv_from_string;
 
 // "../../.venv/Scripts/activate.bat"
+// source ../../.venv/Scripts/activate
 // maturin develop
+// python3 -m maturin develop
 
 /// Formats the sum of two numbers as string.
 // #[pyfunction]
