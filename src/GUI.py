@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from html import escape
-from syntax_handle import test
+from syntax_handle import colorize
 
 def rgb_txt(text,rgb):
 	return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
@@ -19,28 +19,27 @@ class window_widget(QDockWidget):
 		self.setWidget(QWidget())
 		self.layout=QVBoxLayout()
 		self.widget().setLayout(self.layout)
-		#self.layout.addWidget(QLabel('Window Widget'))
+		# self.layout.addWidget(QLabel('Window Widget'))
 
 class text_box(QTextEdit):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptRichText(False)
 		self.setObjectName("text_box")
-		self.textChanged.connect(self.textchanged)
-		self.disableChange=False
+		self.textChanged.connect(self.update_text)
+		self.disableChange=0
 		self.currentPos=1
 		self.setLineWrapMode(QTextEdit.NoWrap)
-	def textchanged(self):
-		if self.disableChange:
-			txtC=self.textCursor()
-			print(self.currentPos)
-			txtC.setPosition(self.currentPos)
-			self.setTextCursor(txtC)
-			self.disableChange=False
+	def update_text(self):
+		if self.disableChange>0:
+			self.disableChange-=1
 			return
-		self.disableChange=True
-		self.currentPos=self.textCursor().position()
-		self.setText(test(self.toPlainText()))
+		self.disableChange=0
+		cpos=self.textCursor().position()
+		colorized=colorize(self.toPlainText(),cpos)
+		#self.setHtml(colorized[1])
+		#self.insertHtml(colorized[0])
+
 	# def cursorPositionChanged(self):
 	# 	print('Cursor Position:',self.textCursor().position())
 

@@ -10,20 +10,31 @@ def rgb_txt(text,rgb):
 def css_txt(text,css):
 	return "<span style='{css}'>{txt}</span>".format(css=css,txt=escape(text))
 
-def test(text):
-	t=word_tokenize(text)
+def colorize(text,cpos=0):
+	txt=text
+	#txt=txt[:cpos+1]+chr(21)+txt[cpos+1:]
+	print(cpos)
+	print("--",len(text))
+	print("--",txt[:cpos]+chr(21)+txt[cpos:])
+	t=[]#word_tokenize(txt)
 	print(t)
 	tagged=pos_tag(t)
-	l=text
-	out=[]
-	for x in tagged:
-		if x[1].startswith("NN"):
-			out.append(rgb_txt(x[0],[255,0,0]))
-		elif x[1].startswith("VB"):
-			out.append(rgb_txt(x[0],[0,255,0]))
-		elif x[1].startswith("JJ"):
-			out.append(rgb_txt(x[0],[0,0,255]))
-		else:
-			out.append(x[0])
-	dt=TWD().detokenize(out)
-	return dt
+	out=txt
+	#print("->",out)
+	before=""
+	for n,i in zip(range(len(tagged)),tagged):
+		if i[0].__contains__(chr(21)):
+			before=out[:out.find(i[0])]
+			out=out.replace(i[0], chr(21))
+			out=out[out.find(chr(21))+1-len(i[0]):]
+			continue
+		if i[1].startswith('NN') or i[1].startswith('VB') or i[1].startswith('JJ'):
+			print("Matched",i[0],out.find(i[0]))
+			out=out.replace(i[0], rgb_txt(i[0], [0, 0, 30]),1)
+			print("2",out)
+	print(before)
+	print(out)
+	return (before,out)
+
+print(chr(21))
+colorize("test",2)
