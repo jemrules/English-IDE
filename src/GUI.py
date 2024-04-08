@@ -3,6 +3,13 @@ import sys,os
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from html import escape
+from syntax_handle import test
+
+def rgb_txt(text,rgb):
+	return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
+def css_txt(text,css):
+	return "<span style='{css}'>{txt}</span>".format(css=css,txt=escape(text))
 
 class window_widget(QDockWidget):
 	def __init__(self):
@@ -17,18 +24,33 @@ class window_widget(QDockWidget):
 class text_box(QTextEdit):
 	def __init__(self):
 		super().__init__()
-		self.setObjectName("text_box")
 		self.setAcceptRichText(False)
+		self.setObjectName("text_box")
+		self.textChanged.connect(self.textchanged)
+		self.disableChange=False
+		self.currentPos=1
 		self.setLineWrapMode(QTextEdit.NoWrap)
-	def cursorPositionChanged(self):
-		print('Cursor Position:',self.textCursor().position())
+	def textchanged(self):
+		if self.disableChange:
+			txtC=self.textCursor()
+			print(self.currentPos)
+			txtC.setPosition(self.currentPos)
+			self.setTextCursor(txtC)
+			self.disableChange=False
+			return
+		self.disableChange=True
+		self.currentPos=self.textCursor().position()
+		self.setText(test(self.toPlainText()))
+	# def cursorPositionChanged(self):
+	# 	print('Cursor Position:',self.textCursor().position())
 
 class text_area(QWidget):
 	def __init__(self,name="text_area"):
 		super().__init__()
 		self.layout=QVBoxLayout()
+		# self.setObjectName("test")
 		self.setLayout(self.layout)
-		self.text_box=QTextEdit()
+		self.text_box=text_box()
 		self.layout.addWidget(self.text_box)
 
 class suggestion_area(QWidget):
@@ -50,7 +72,6 @@ class GUI(QMainWindow):
 		self.setCentralWidget(QWidget())
 		self.layout=QVBoxLayout()
 		self.centralWidget().setLayout(self.layout)
-
 		self.text_areas=QTabWidget()
 		self.text_areas.setObjectName("text_areas")
 		self.layout.addWidget(self.text_areas)

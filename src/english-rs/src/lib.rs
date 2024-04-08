@@ -17,6 +17,7 @@ use crate::neural_network::active_funcs::get_deriv_from_string;
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 //     Ok((a + b).to_string())
 // }
+
 #[pyfunction]
 fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResult<String> {
     // let mut n = neuron {
@@ -37,11 +38,11 @@ fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResu
     Ok((netw.shape.iter().map(|a| a.1.clone()).collect::<Vec<String>>().join(" ")).to_string())
 }
 
-
-
 /// A Python module implemented in Rust.
 #[pymodule]
-fn english_rs(_py: Python, m: &PyModule) -> PyResult<()> {
+fn nn(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test_neuron, m)?)?;
     Ok(())
 }
+
+//  //          println!("{}",model.len());
