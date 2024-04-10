@@ -20,13 +20,13 @@ class window_widget(QDockWidget):
 		self.layout=QVBoxLayout()
 		self.widget().setLayout(self.layout)
 		# self.layout.addWidget(QLabel('Window Widget'))
-
 class text_box(QTextEdit):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptRichText(False)
 		self.setObjectName("text_box")
 		self.textChanged.connect(self.update_text)
+		self.cursorPositionChanged.connect(self.cursor_pos_update)
 		self.disableChange=0
 		self.currentPos=1
 		self.setLineWrapMode(QTextEdit.NoWrap)
@@ -34,14 +34,16 @@ class text_box(QTextEdit):
 		if self.disableChange>0:
 			self.disableChange-=1
 			return
-		self.disableChange=0
+		self.disableChange=7
 		cpos=self.textCursor().position()
-		colorized=colorize(self.toPlainText(),cpos)
-		#self.setHtml(colorized[1])
-		#self.insertHtml(colorized[0])
-
-	# def cursorPositionChanged(self):
-	# 	print('Cursor Position:',self.textCursor().position())
+		print([self.toPlainText()])
+		self.setPlainText(self.toPlainText())
+		# colorized=colorize(self.toPlainText(),cpos)
+		# self.setHtml(colorized[2])
+		# self.insertHtml(colorized[0])
+		# self.insertPlainText(colorized[1])
+	def cursor_pos_update(self):
+		self.update_text()
 
 class text_area(QWidget):
 	def __init__(self,name="text_area"):
@@ -76,7 +78,6 @@ class GUI(QMainWindow):
 		self.layout.addWidget(self.text_areas)
 		self.text_areas.addTab(text_area('tab_1'),'Tab 1')
 		self.text_areas.addTab(text_area('tab_2'),'Tab 2')
-
 app=QApplication(sys.argv)
 f=open("style.css","r")
 app.setStyleSheet(f.read())
