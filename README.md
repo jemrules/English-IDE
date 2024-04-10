@@ -7,3 +7,6 @@ English IDE is just like a programming IDE, but it gives you grammer errors and 
 - English IDE uses **Python as the main language.** English IDE uses **PyQt5** for Python to make a gui.
 - **We use Rust for the auto-correct and auto-complete.** This is because **Rust is 2x to 50x faster than Python**. So the much heavier work is done on Rust.
 - We use **maturin** to make Rust programs into python packages.
+
+## How to run
+- English IDE rust end is not compiled. This means that you will only be able to run GUI.py.
