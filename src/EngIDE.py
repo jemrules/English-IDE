@@ -29,19 +29,22 @@ class text_box(QTextEdit):
 		self.cursorPositionChanged.connect(self.cursor_pos_update)
 		self.disableChange=0
 		self.currentPos=1
+		self.last=""
 		self.setLineWrapMode(QTextEdit.NoWrap)
 	def update_text(self):
 		if self.disableChange>0:
 			self.disableChange-=1
 			return
-		self.disableChange=7
-		cpos=self.textCursor().position()
-		print([self.toPlainText()])
-		self.setPlainText(self.toPlainText())
-		# colorized=colorize(self.toPlainText(),cpos)
-		# self.setHtml(colorized[2])
-		# self.insertHtml(colorized[0])
-		# self.insertPlainText(colorized[1])
+		self.disableChange=3
+		self.currentPos=self.textCursor().position()
+		colorized=colorize(self.toPlainText(),self.currentPos)
+		if self.last==colorized[0]:
+			return
+		self.setHtml(colorized[0])
+		self.last=colorized[0]
+		cursor=self.textCursor()
+		cursor.setPosition(self.currentPos+colorized[1])
+		self.setTextCursor(cursor)
 	def cursor_pos_update(self):
 		self.update_text()
 

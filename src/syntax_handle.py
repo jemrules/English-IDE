@@ -9,70 +9,40 @@ import nltk
 
 
 def rgb_txt(text,rgb):
-	return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
+	return "<span style='color:rgb({R},{G},{B});display:inline-block;white-space: pre;'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
 def css_txt(text,css):
 	return "<span style='{css}'>{txt}</span>".format(css=css,txt=escape(text))
 def rl(x):
 	return range(len(x))
 
-def color_list(l):
-	out=[]
-	for x in l:
+def colorize(text,cpos=0):
+	offset=text.count("\t")*3
+	txt=text.replace("\t","    ")
+	if len(txt)==0:
+		return (txt,0)
+	#txt=txt[:cpos]+chr(21)+txt[cpos:]
+	words=word_tokenize(txt)
+	tags=pos_tag(words)
+	if len(tags)==0 or len(words)==0:
+		return (rgb_txt(txt,(200,200,200)),offset)
+	before=txt[:txt.find(tags[0][0])]
+	pullfrom=txt
+	out=""
+	for i in rl(tags):
+		find=pullfrom.find(tags[i][0])+len(tags[i][0])
 		color=(200,200,200)
-		match x[1]:
+		match tags[i][1][:2]:
 			case "NN":
-				color=(200,200,255)
+				color=(200,255,200)
 			case "VB":
 				color=(255,200,200)
 			case "JJ":
-				color=(200,255,200)
+				color=(200,200,255)
+			case "." | "!" | "?":
+				color=(255,127,0)
 			case _:
 				color=(200,200,200)
-		out.append(rgb_txt(x[0],color))
-	print("cl-",l,TWD().detokenize(out))
-	return TWD().detokenize(out)
-
-def colorize(text,cpos=0):
-	txt=text
-	txt=txt[:cpos]+chr(21)+txt[cpos:]
-	if txt=="\x15":
-		return ("","","")
-	print(cpos)
-	print(txt)
-	lines=txt.split("\n")
-	# t=word_tokenize(txt)
-	t=[]
-	for x in rl(lines):
-		print("--",lines[x])
-		t+=word_tokenize(lines[x])
-		print(t)
-		if x!=len(lines)-1:
-			t.append("\n")
-	if t.__contains__("\x15"):
-		t[t.index("\x15")]=" \x15"
-	WorkingOn=""
-	WorkingOnIndex=0
-	PreT=[]
-	PostT=[]
-	for i in range(len(t)):
-		if t[i].__contains__(chr(21)):
-			PreT=t[:i+1]
-			WorkingOn=t[i]
-			WorkingOnIndex=i
-			PostT=t[i+1:]
-			break
-	pre=""
-	post=""
-	if len(PreT)==0:
-		pre=""
-	else:
-		preToken=pos_tag(PreT)
-		pre=color_list(preToken)
-	if len(PostT)==0:
-		post=""
-	else:
-		postToken=pos_tag(PostT)
-		post=color_list(postToken)
-	WorkingOn=WorkingOn.replace("\x15","")
-	print("==",[pre+WorkingOn],[post])
-	return [pre,WorkingOn,post]
+		out+=rgb_txt(pullfrom[:find], color)
+		pullfrom=pullfrom[find:]
+	#print("==",[pre+WorkingOn],[post])
+	return (out+pullfrom,offset)
