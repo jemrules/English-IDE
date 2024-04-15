@@ -18,8 +18,8 @@ use crate::neural_network::active_funcs::get_deriv_from_string;
 //     Ok((a + b).to_string())
 // }
 #[pyfunction]
-fn autocorrect(word: String) -> PyResult<Vec<String>> {
-    Ok(vec!(["test".to_string()]))
+fn autocorrect(word: String) -> PyResult<String> {
+    Ok("test".to_string())
 }
 
 
