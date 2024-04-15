@@ -9,6 +9,6 @@ English IDE is just like a programming IDE, but it gives you grammer errors and 
 - We use **maturin** to make Rust programs into python packages.
 
 ## How to run
- *English IDE rust end is not compiled. This means you will not get autocorrect.*
+   *English IDE rust end is not compiled. This means you will not get autocorrect.*
 1. Install Packages by running **InstallPackages.py** or by using **pip3 install -r requirements.txt**.
 2. Use what every method you would like to **open "EngIDE.py"**
