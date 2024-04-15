@@ -1,0 +1,8 @@
+/Users/9621955/AdvancedComputerProgramming/Semester2/EnglishIDE/English-IDE/src/english-rs/target/debug/build/target-lexicon-0a29640457d09359/build_script_build-0a29640457d09359: /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/build.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/data_model.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/triple.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/targets.rs
+
+/Users/9621955/AdvancedComputerProgramming/Semester2/EnglishIDE/English-IDE/src/english-rs/target/debug/build/target-lexicon-0a29640457d09359/build_script_build-0a29640457d09359.d: /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/build.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/data_model.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/triple.rs /Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/targets.rs
+
+/Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/build.rs:
+/Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/data_model.rs:
+/Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/triple.rs:
+/Users/9621955/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.14/src/targets.rs:

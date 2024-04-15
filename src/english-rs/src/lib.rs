@@ -17,6 +17,11 @@ use crate::neural_network::active_funcs::get_deriv_from_string;
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 //     Ok((a + b).to_string())
 // }
+#[pyfunction]
+fn autocorrect(word: String) -> PyResult<Vec<String>> {
+    Ok(vec!(["test".to_string()]))
+}
+
 
 #[pymodule]
 fn auto_features(_py: Python,m: &PyModule) -> PyResult<()> {
