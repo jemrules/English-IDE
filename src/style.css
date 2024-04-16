@@ -1,5 +1,33 @@
+QTabBar::tab {
+	background-color: #FF9000;
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	color: #2A3C3C;
+	margin-right: 5px;
+	padding: 5px;
+}
+QTabBar::tab:selected {
+	background-color: #FF9000;
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	border-top: 2px solid #FFC453;
+	color: #2A3C3C;
+	margin-right: 5px;
+	padding: 5px;
+}
+QWidget {
+	background-color: #3C3C3C;
+	color: #FFFFFF;
+	border: none;
+}
 QTextEdit#text_box {
-	
+	background-color: #3C3C3C;
+}
+QLabel#e {
+	background-color: rgb(255,0,0);
+	border: 5px solid #FF0000;
+	color: #F00;
+	position: fixed;
 }
 /*QTabWidget::pane {
 	border: 0px;

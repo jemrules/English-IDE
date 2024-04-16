@@ -31,17 +31,17 @@ def colorize(text,cpos=0):
 	for i in rl(tags):
 		find=pullfrom.find(tags[i][0])+len(tags[i][0])
 		color=(200,200,200)
-		match tags[i][1][:2]:
-			case "NN":
-				color=(200,255,200)
-			case "VB":
-				color=(255,200,200)
-			case "JJ":
-				color=(200,200,255)
-			case "." | "!" | "?":
-				color=(255,127,0)
-			case _:
-				color=(200,200,200)
+		m=tags[i][1][:2]
+		if m=="NN":
+			color=(200,255,200)
+		elif m=="VB":
+			color=(255,200,200)
+		elif m=="JJ":
+			color=(200,200,255)
+		elif m=="." or m=="!" or m=="?":
+			color=(255,127,0)
+		else:
+			color=(200,200,200)
 		out+=rgb_txt(pullfrom[:find], color)
 		pullfrom=pullfrom[find:]
 	#print("==",[pre+WorkingOn],[post])

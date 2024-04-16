@@ -5,13 +5,15 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
-rust=False
-try:
-    import english_rs as Ers
-    rust=True
-except ImportError:
-    rust=False
-    print("Rust end not compiled!")
+from english_rs.english_rs import autocorrect
+print(autocorrect("hi"))
+# rust=False
+# try:
+#     import english_rs as Ers
+#     rust=True
+# except ImportError:
+#     rust=False
+#     print("Rust end not compiled!")
 
 def rgb_txt(text,rgb):
     return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
@@ -59,18 +61,27 @@ class text_area(QWidget):
     def __init__(self,name="text_area"):
         super().__init__()
         self.layout=QVBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
         # self.setObjectName("test")
         self.setLayout(self.layout)
         self.text_box=text_box()
+        self.cursorBox=suggestion_area()
+        self.layout.addWidget(self.cursorBox)
         self.layout.addWidget(self.text_box)
+    #     self.text_box.cursorPositionChanged.connect(self.move_c)
+    # def move_c(self):
+    #     self.setFixedSize(200,500)
+    #     self.move(50,500)
 
 class suggestion_area(QWidget):
     def __init__(self):
         super().__init__()
-        # self.setObjectName("SuggestionArea")
         self.layout=QVBoxLayout()
+        self.layout.setObjectName("suggestion_area")
         self.setLayout(self.layout)
-        self.layout.addWidget(QLabel('Suggestion Area'))
+        self.e=QLabel('Suggestion Area')
+        self.e.setObjectName("e")
+        self.layout.addWidget(self.e)
 
 class GUI(QMainWindow):
     def __init__(self):

@@ -1,11 +1,14 @@
 use pyo3::prelude::*;
 
-mod neural_network;
+// mod neural_network;
 
-use crate::neural_network::net;
-use crate::neural_network::neuron;
-use crate::neural_network::active_funcs::get_from_string;
-use crate::neural_network::active_funcs::get_deriv_from_string;
+// use crate::neural_network::net;
+// use crate::neural_network::neuron;
+// use crate::neural_network::active_funcs::get_from_string;
+// use crate::neural_network::active_funcs::get_deriv_from_string;
+
+use std::env;
+use std::fs;
 
 // "../../.venv/Scripts/activate.bat"
 // source ../../.venv/Scripts/activate
@@ -17,16 +20,32 @@ use crate::neural_network::active_funcs::get_deriv_from_string;
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 //     Ok((a + b).to_string())
 // }
+
+
 #[pyfunction]
-fn autocorrect(word: String) -> PyResult<String> {
-    Ok("test".to_string())
+fn autocorrect(word: String) -> PyResult<Vec<String>> {
+    let contents = fs::read_to_string("word_data/wordbank.txt")
+        .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
+    Ok(vec![word])
 }
 
 
 #[pymodule]
+#[pyo3(name = "english_rs")]
 fn auto_features(_py: Python,m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(autocorrect, m)?)?;
     Ok(())
 }
+
+
+
+
+
+
+
+
+
+
 
 // #[pyfunction]
 // fn test_neuron(q_weights: Vec<f32>, q_bias: f32, q_activation: String) -> PyResult<String> {
