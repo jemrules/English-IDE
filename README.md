@@ -10,9 +10,19 @@ English IDE is just like a programming IDE, but it gives you grammer errors and 
 
 ## How to run
 *English IDE rust end is not compiled. This means you will not get autocorrect.*
-1. Install Packages by running **InstallPackages.py** or by using **pip3 install -r requirements.txt**.
+1. Install Packages by running **InstallPackages.py**. Alternatively you can manually install by running:
+```bash
+# For macOS
+pip3 install -r requirements.txt
+pip3 install src/english-rs/target/wheels/english_rs-0.1.0-cp310-cp310-macosx_11_0_arm64.whl
+```
+```bat
+:: For Windows
+pip install -r requirements.txt
+pip install src\english-rs\target\wheels\english_rs-0.1.0-cp37-none-win_amd64.whl
+```
 2. Use what every method you would like to **open "EngIDE.py"**
 
 
-### Credits
+#### Credits
  - **dwyl** for the word list that I use for the auto-correct. [Link to dwyl's word lists](https://github.com/dwyl/english-words/tree/master)
