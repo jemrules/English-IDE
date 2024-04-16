@@ -12,3 +12,7 @@ English IDE is just like a programming IDE, but it gives you grammer errors and 
 *English IDE rust end is not compiled. This means you will not get autocorrect.*
 1. Install Packages by running **InstallPackages.py** or by using **pip3 install -r requirements.txt**.
 2. Use what every method you would like to **open "EngIDE.py"**
+
+
+### Credits
+ - **dwyl** for the word list that I use for the auto-correct. [Link to dwyl's word lists](https://github.com/dwyl/english-words/tree/master)
