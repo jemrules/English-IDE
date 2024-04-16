@@ -20,12 +20,20 @@ use std::fs;
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 //     Ok((a + b).to_string())
 // }
-
+fn compare_correct(a: String, b:String) -> i16 {
+    let mut grid=vec![vec![0; b.len()+1];a.len()+1];
+    println!("{:?}",grid);
+    0
+}
 
 #[pyfunction]
 fn autocorrect(word: String) -> PyResult<Vec<String>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
+    let mut words: Vec<String> = Vec::new();
+    for line in contents.lines() {
+        words.push(line.to_string());
+    }
     Ok(vec![word])
 }
 
