@@ -9,11 +9,13 @@ use pyo3::prelude::*;
 
 use std::env;
 use std::fs;
+use std::cmp::min;
 
 // "../../.venv/Scripts/activate.bat"
 // source ../../.venv/Scripts/activate
 // maturin develop
 // python3 -m maturin develop
+// python -u ../EngIDE.py
 
 /// Formats the sum of two numbers as string.
 // #[pyfunction]
@@ -22,19 +24,40 @@ use std::fs;
 // }
 fn compare_correct(a: String, b:String) -> i16 {
     let mut grid=vec![vec![0; b.len()+1];a.len()+1];
-    println!("{:?}",grid);
-    0
+    // println!("{:?}",grid);
+    for x in 0..a.len()+1 {
+        for y in 0..b.len()+1 {
+            if x==0 {
+                grid[x][y]=y as i16;
+            } else if y==0 {
+                grid[x][y]=x as i16;
+            } else {
+                grid[x][y]=grid[x-1][y].min(grid[x-1][y]).min(grid[x][y-1]);
+                if a.chars().nth(x-1).unwrap()!=b.chars().nth(y-1).unwrap() {
+                    grid[x][y]+=1;
+                }
+            }
+
+        }
+    }
+    grid[grid.len()-1][grid[0].len()-1] as i16
 }
 
 #[pyfunction]
 fn autocorrect(word: String) -> PyResult<Vec<String>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
-    let mut words: Vec<String> = Vec::new();
+    let max_dist=3;
+    let mut organized: Vec<(String,i16)>=Vec::new();
     for line in contents.lines() {
-        words.push(line.to_string());
+        let dist=compare_correct(word.clone(),line.to_string());
+        if dist<=max_dist {
+            organized.push((line.to_string(),dist));
+        }
     }
-    Ok(vec![word])
+    organized.sort_by(|a,b| a.1.cmp(&b.1));
+    let words=organized.iter().map(|a| a.0.clone()).collect::<Vec<String>>();
+    Ok(words)
 }
 
 
