@@ -21,7 +21,7 @@ def css_txt(text,css):
     return "<span style='{css}'>{txt}</span>".format(css=css,txt=escape(text))
 
 class window_widget(QDockWidget):
-    def __init__(self):
+    def __init__(self,p=None):
         super().__init__()
         # self.setObjectName("WindowWidget")
         self.setWindowTitle('Window Widget')
@@ -30,7 +30,7 @@ class window_widget(QDockWidget):
         self.widget().setLayout(self.layout)
         # self.layout.addWidget(QLabel('Window Widget'))
 class text_box(QTextEdit):
-    def __init__(self):
+    def __init__(self,p=None):
         super().__init__()
         self.setAcceptRichText(False)
         self.setObjectName("text_box")
@@ -58,29 +58,40 @@ class text_box(QTextEdit):
         self.update_text()
 
 class text_area(QWidget):
-    def __init__(self,name="text_area"):
+    def __init__(self,name="text_area",p=None):
         super().__init__()
         self.layout=QVBoxLayout()
         self.layout.setContentsMargins(0,0,0,0)
         # self.setObjectName("test")
         self.setLayout(self.layout)
         self.text_box=text_box()
-        self.cursorBox=suggestion_area()
-        self.cursorBox.show()
+        self.text_box.cursorPositionChanged.connect(self.move_c)
+        self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
+        self.p=p
+    def move_c(self):
+        print(self.text_box.cursorRect())
+        self.cursorBox.move(self.text_box.cursorRect().x(),self.text_box.cursorRect().y())
+        self.cursorBox.show()
+        inst=QApplication.instance()
+        for x in inst.allWidgets():
+            if isinstance(x,QMainWindow):
+                x.activateWindow()
+
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
     #     self.setFixedSize(200,500)
     #     self.move(50,500)
 
 class suggestion_area(QDialog):
-    def __init__(self):
+    def __init__(self,p=None):
         super().__init__()
         self.setObjectName("suggestion_area")
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.NonModal)
         #self.setWindowFlags()
         self.layout=QVBoxLayout()
         self.layout.addWidget(QLabel("Suggestions"))
+        self.p=p
         self.setLayout(self.layout)
 class GUI(QMainWindow):
     def __init__(self):
@@ -91,13 +102,14 @@ class GUI(QMainWindow):
         self.setWindowTitle('GUI')
         self.setGeometry(100, 100, 800, 600)
         self.setCentralWidget(QWidget())
+        self.setObjectName("GUI")
         self.layout=QVBoxLayout()
         self.centralWidget().setLayout(self.layout)
         self.text_areas=QTabWidget()
         self.text_areas.setObjectName("text_areas")
         self.layout.addWidget(self.text_areas)
-        self.text_areas.addTab(text_area('tab_1'),'Tab 1')
-        self.text_areas.addTab(text_area('tab_2'),'Tab 2')
+        self.text_areas.addTab(text_area('tab_1',p=self),'Tab 1')
+        self.text_areas.addTab(text_area('tab_2',p=self),'Tab 2')
 app=QApplication(sys.argv)
 f=open("style.css","r")
 app.setStyleSheet(f.read())
