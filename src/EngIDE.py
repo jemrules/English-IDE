@@ -66,23 +66,22 @@ class text_area(QWidget):
         self.setLayout(self.layout)
         self.text_box=text_box()
         self.cursorBox=suggestion_area()
-        self.layout.addWidget(self.cursorBox)
+        self.cursorBox.show()
         self.layout.addWidget(self.text_box)
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
     #     self.setFixedSize(200,500)
     #     self.move(50,500)
 
-class suggestion_area(QWidget):
+class suggestion_area(QDialog):
     def __init__(self):
         super().__init__()
+        self.setObjectName("suggestion_area")
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        #self.setWindowFlags()
         self.layout=QVBoxLayout()
-        self.layout.setObjectName("suggestion_area")
+        self.layout.addWidget(QLabel("Suggestions"))
         self.setLayout(self.layout)
-        self.e=QLabel('Suggestion Area')
-        self.e.setObjectName("e")
-        self.layout.addWidget(self.e)
-
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
