@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
 from english_rs.english_rs import autocorrect
-print(autocorrect("hi"))
 # rust=False
 # try:
 #     import english_rs as Ers
@@ -70,13 +69,18 @@ class text_area(QWidget):
         self.layout.addWidget(self.text_box)
         self.p=p
     def move_c(self):
-        print(self.text_box.cursorRect())
-        self.cursorBox.move(self.text_box.cursorRect().x(),self.text_box.cursorRect().y())
-        self.cursorBox.show()
+        # print(self.text_box.cursorRect())
+        WPos=(0,0)
+        WindApp=None
         inst=QApplication.instance()
         for x in inst.allWidgets():
             if isinstance(x,QMainWindow):
-                x.activateWindow()
+                WindApp=x
+                WPos=(x.pos().x(),x.pos().y())
+        self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
+        self.cursorBox.show()
+        self.cursorBox.UpdateText(self.text_box.toPlainText())
+        WindApp.activateWindow()
 
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
@@ -90,9 +94,18 @@ class suggestion_area(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.NonModal)
         #self.setWindowFlags()
         self.layout=QVBoxLayout()
-        self.layout.addWidget(QLabel("Suggestions"))
+        self.Label=QLabel("Suggestions")
+        self.layout.addWidget(self.Label)
         self.p=p
+        self.txt=""
         self.setLayout(self.layout)
+    def UpdateText(self,txt):
+        self.txt=txt
+        if len(txt.split())>0:
+            suggestions=autocorrect(txt.split()[len(txt.split())-1])
+            print(txt.split()[len(txt.split())-1])
+            print(suggestions)
+            #self.Label.setText(suggestions[0])
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -110,6 +123,11 @@ class GUI(QMainWindow):
         self.layout.addWidget(self.text_areas)
         self.text_areas.addTab(text_area('tab_1',p=self),'Tab 1')
         self.text_areas.addTab(text_area('tab_2',p=self),'Tab 2')
+    def closeEvent(self,a):
+        inst=QApplication.instance()
+        for x in inst.allWidgets():
+            if isinstance(x,QDialog):
+                x.reject()
 app=QApplication(sys.argv)
 f=open("style.css","r")
 app.setStyleSheet(f.read())

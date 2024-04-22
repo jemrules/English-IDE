@@ -47,9 +47,12 @@ fn compare_correct(a: String, b:String) -> i16 {
 fn autocorrect(word: String) -> PyResult<Vec<String>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
-    let max_dist=3;
+    let max_dist=5;
     let mut organized: Vec<(String,i16)>=Vec::new();
     for line in contents.lines() {
+        if word.clone()==line.to_string() {
+            continue;
+        }
         let dist=compare_correct(word.clone(),line.to_string());
         if dist<=max_dist {
             organized.push((line.to_string(),dist));
