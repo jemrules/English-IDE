@@ -22,7 +22,7 @@ use std::cmp::min;
 // fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 //     Ok((a + b).to_string())
 // }
-fn compare_correct(a: String, b:String) -> i16 {
+fn compare_correct(a: String, b:String) -> Vec<Vec<i16>> {
     let mut grid=vec![vec![0; b.len()+1];a.len()+1];
     // println!("{:?}",grid);
     for x in 0..a.len()+1 {
@@ -32,7 +32,7 @@ fn compare_correct(a: String, b:String) -> i16 {
             } else if y==0 {
                 grid[x][y]=x as i16;
             } else {
-                grid[x][y]=grid[x-1][y].min(grid[x-1][y]).min(grid[x][y-1]);
+                grid[x][y]=grid[x-1][y].min(grid[x-1][y-1]).min(grid[x][y-1]);
                 if a.chars().nth(x-1).unwrap()!=b.chars().nth(y-1).unwrap() {
                     grid[x][y]+=1;
                 }
@@ -40,34 +40,42 @@ fn compare_correct(a: String, b:String) -> i16 {
 
         }
     }
-    grid[grid.len()-1][grid[0].len()-1] as i16
+    grid
 }
 
 #[pyfunction]
 fn autocorrect(word: String) -> PyResult<Vec<String>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
-    let max_dist=5;
+    let max_dist=3;
     let mut organized: Vec<(String,i16)>=Vec::new();
     for line in contents.lines() {
         if word.clone()==line.to_string() {
             continue;
         }
-        let dist=compare_correct(word.clone(),line.to_string());
+        let grid=compare_correct(word.clone(),line.to_string());
+        let dist=grid[grid.len()-1][grid[0].len()-1] as i16;
         if dist<=max_dist {
             organized.push((line.to_string(),dist));
         }
     }
     organized.sort_by(|a,b| a.1.cmp(&b.1));
     let words=organized.iter().map(|a| a.0.clone()).collect::<Vec<String>>();
-    Ok(words)
+    Ok(words[0..min(10,words.len())].to_vec())
 }
+
+#[pyfunction]
+fn compare_words(word1: String,word2: String) -> PyResult<Vec<Vec<i16>>> {
+    Ok(compare_correct(word1,word2))
+}
+
 
 
 #[pymodule]
 #[pyo3(name = "english_rs")]
 fn auto_features(_py: Python,m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(autocorrect, m)?)?;
+    m.add_function(wrap_pyfunction!(compare_words, m)?)?;
     Ok(())
 }
 

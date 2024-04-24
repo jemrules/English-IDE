@@ -5,7 +5,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
-from english_rs.english_rs import autocorrect
+from english_rs.english_rs import autocorrect, compare_words
+import threading
 # rust=False
 # try:
 #     import english_rs as Ers
@@ -13,6 +14,8 @@ from english_rs.english_rs import autocorrect
 # except ImportError:
 #     rust=False
 #     print("Rust end not compiled!")
+
+print("\n".join([str(y) for y in compare_words("hello","hello")]))
 
 def rgb_txt(text,rgb):
     return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
@@ -98,14 +101,24 @@ class suggestion_area(QDialog):
         self.layout.addWidget(self.Label)
         self.p=p
         self.txt=""
+        self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt,))
+        self.ACThread.start()
+        self.suggestions=[]
         self.setLayout(self.layout)
+    def ACTh(self,x):
+        self.suggestions=autocorrect(x)
     def UpdateText(self,txt):
+        print(txt)
         self.txt=txt
         if len(txt.split())>0:
-            suggestions=autocorrect(txt.split()[len(txt.split())-1])
-            print(txt.split()[len(txt.split())-1])
-            print(suggestions)
-            #self.Label.setText(suggestions[0])
+            if self.ACThread.is_alive():
+                self.ACThread.join()
+                self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt,))
+                self.ACThread.start()
+            #print(self.suggestions)
+            #print(txt.split()[len(txt.split())-1])
+            #print(suggestions)
+            self.Label.setText("\n".join([str(x) for x in self.suggestions[:5]]))
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
