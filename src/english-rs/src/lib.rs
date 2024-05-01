@@ -44,24 +44,28 @@ fn compare_correct(a: String, b:String) -> Vec<Vec<i16>> {
 }
 
 #[pyfunction]
-fn autocorrect(word: String) -> PyResult<Vec<String>> {
+fn autocorrect(word: String) -> PyResult<Vec<(String,i16)>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
     let max_dist=3;
-    let mut organized: Vec<(String,i16)>=Vec::new();
-    for line in contents.lines() {
+    let mut organized: Vec<(String,i16,i32)>=Vec::new();
+    for qline in contents.lines() {
+        let line=qline.split(";").collect::<Vec<&str>>()[0];
+        let feq=qline.split(";").collect::<Vec<&str>>()[1].parse::<i32>().unwrap();
         if word.clone()==line.to_string() {
             continue;
         }
         let grid=compare_correct(word.clone(),line.to_string());
         let dist=grid[grid.len()-1][grid[0].len()-1] as i16;
         if dist<=max_dist {
-            organized.push((line.to_string(),dist));
+            organized.push((line.to_string(),dist,feq));
         }
     }
-    organized.sort_by(|a,b| a.1.cmp(&b.1));
-    let words=organized.iter().map(|a| a.0.clone()).collect::<Vec<String>>();
-    Ok(words[0..min(10,words.len())].to_vec())
+    organized.sort_by_key(|k| k.1);
+    organized=organized[0..min(20,organized.len())].to_vec();
+    organized.sort_by_key(|k| k.2);
+    let words=organized.iter().map(|a| (a.0.clone(),a.1.clone())).collect::<Vec<(String,i16)>>();
+    Ok(words[0..min(20,words.len())].to_vec())
 }
 
 #[pyfunction]

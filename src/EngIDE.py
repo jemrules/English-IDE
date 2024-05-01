@@ -15,6 +15,8 @@ import threading
 #     rust=False
 #     print("Rust end not compiled!")
 
+# https://www.sketchengine.eu/english-word-list/
+
 print("\n".join([str(y) for y in compare_words("hello","hello")]))
 
 def rgb_txt(text,rgb):
@@ -46,7 +48,7 @@ class text_box(QTextEdit):
         if self.disableChange>0:
             self.disableChange-=1
             return
-        self.disableChange=3
+        self.disableChange=2
         self.currentPos=self.textCursor().position()
         colorized=colorize(self.toPlainText(),self.currentPos)
         if self.last==colorized[0]:
@@ -104,21 +106,32 @@ class suggestion_area(QDialog):
         self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt,))
         self.ACThread.start()
         self.suggestions=[]
+        self.lastWord=""
         self.setLayout(self.layout)
     def ACTh(self,x):
+        print("in",x)
         self.suggestions=autocorrect(x)
     def UpdateText(self,txt):
         print(txt)
-        self.txt=txt
+        self.txt=txt.lower()
         if len(txt.split())>0:
-            if self.ACThread.is_alive():
+            if not self.ACThread.is_alive() and self.lastWord!=txt.split()[len(txt.split())-1]:
                 self.ACThread.join()
-                self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt,))
+                self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt.split()[len(txt.split())-1],))
                 self.ACThread.start()
-            #print(self.suggestions)
+                self.lastWord=txt.split()[len(self.txt.split())-1]
+            print(self.suggestions[:20],self.lastWord==self.txt.split()[len(txt.split())-1])
             #print(txt.split()[len(txt.split())-1])
             #print(suggestions)
-            self.Label.setText("\n".join([str(x) for x in self.suggestions[:5]]))
+            minimum=0
+            maximum=0
+            for x in self.suggestions[:20]:
+                if x[1]>maximum:
+                    maximum=x[1]
+                if x[1]<minimum:
+                    minimum=x[1]
+            maximum-=minimum
+            self.Label.setText("<br/>".join([rgb_txt(str(x[0]),(255-255*x[1]/maximum*0.5,255*0.8,255-255*x[1]/maximum*0.5)) for x in self.suggestions[:20]]))
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
