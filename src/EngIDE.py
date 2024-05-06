@@ -66,13 +66,16 @@ class text_area(QWidget):
         super().__init__()
         self.layout=QVBoxLayout()
         self.layout.setContentsMargins(0,0,0,0)
-        # self.setObjectName("test")
+        self.setObjectName("test LABEL")
         self.setLayout(self.layout)
         self.text_box=text_box()
         self.text_box.cursorPositionChanged.connect(self.move_c)
         self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
         self.p=p
+    def mouseMoved(self,event):
+        print(self.text_box.textCursor().document())
+        self.cursorBox.setVisible(False)
     def move_c(self):
         # print(self.text_box.cursorRect())
         WPos=(0,0)
@@ -82,11 +85,11 @@ class text_area(QWidget):
             if isinstance(x,QMainWindow):
                 WindApp=x
                 WPos=(x.pos().x(),x.pos().y())
+        self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
         self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
         self.cursorBox.show()
         self.cursorBox.UpdateText(self.text_box.toPlainText())
         WindApp.activateWindow()
-
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
     #     self.setFixedSize(200,500)
@@ -105,14 +108,19 @@ class suggestion_area(QDialog):
         self.txt=""
         self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt,))
         self.ACThread.start()
+        # inst=QApplication.instance()
+        # for x in inst.allWidgets():
+        #     if isinstance(x,QMainWindow ):
+        #         x.mouseMoveEvent.connect(self.mouseClicked)
         self.suggestions=[]
         self.lastWord=""
         self.setLayout(self.layout)
     def ACTh(self,x):
-        print("in",x)
+        #print("in",x)
         self.suggestions=autocorrect(x)
     def UpdateText(self,txt):
-        print(txt)
+        #print("--",self.size().width(),self.size().height())
+        #print(txt)
         self.txt=txt.lower()
         if len(txt.split())>0:
             if not self.ACThread.is_alive() and self.lastWord!=txt.split()[len(txt.split())-1]:
@@ -120,7 +128,7 @@ class suggestion_area(QDialog):
                 self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt.split()[len(txt.split())-1],))
                 self.ACThread.start()
                 self.lastWord=txt.split()[len(self.txt.split())-1]
-            print(self.suggestions[:20],self.lastWord==self.txt.split()[len(txt.split())-1])
+            #print(self.suggestions[:20],self.lastWord==self.txt.split()[len(txt.split())-1])
             #print(txt.split()[len(txt.split())-1])
             #print(suggestions)
             minimum=0
@@ -131,7 +139,7 @@ class suggestion_area(QDialog):
                 if x[1]<minimum:
                     minimum=x[1]
             maximum-=minimum
-            self.Label.setText("<br/>".join([rgb_txt(str(x[0]),(255-255*x[1]/maximum*0.5,255*0.8,255-255*x[1]/maximum*0.5)) for x in self.suggestions[:20]]))
+            self.Label.setText("<br/>".join([rgb_txt(("> " if x[1]/maximum<=0.5 else "")+str(x[0]),(255*x[1]/maximum*0.8,255,255*x[1]/maximum*0.8)) for x in self.suggestions[:20] if x[1]/maximum<=0.75]))
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -149,11 +157,21 @@ class GUI(QMainWindow):
         self.layout.addWidget(self.text_areas)
         self.text_areas.addTab(text_area('tab_1',p=self),'Tab 1')
         self.text_areas.addTab(text_area('tab_2',p=self),'Tab 2')
+        self.setMouseTracking(True)
     def closeEvent(self,a):
         inst=QApplication.instance()
         for x in inst.allWidgets():
             if isinstance(x,QDialog):
                 x.reject()
+    def mouseMoveEvent(self,event):
+        inst=QApplication.instance()
+        for x in inst.allWidgets():
+            if isinstance(x,QWidget):
+                try:
+                    x.mouseMoved(event)
+                    print("MOUSE EVENT")
+                except Exception as err:
+                    pass
 app=QApplication(sys.argv)
 f=open("style.css","r")
 app.setStyleSheet(f.read())
