@@ -85,6 +85,8 @@ class text_area(QWidget):
             if isinstance(x,QMainWindow):
                 WindApp=x
                 WPos=(x.pos().x(),x.pos().y())
+            if isinstance(x, text_area) and x!=self:
+                x.cursorBox.setVisible(False)
         self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
         self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
         self.cursorBox.show()
@@ -155,23 +157,22 @@ class GUI(QMainWindow):
         self.text_areas=QTabWidget()
         self.text_areas.setObjectName("text_areas")
         self.layout.addWidget(self.text_areas)
-        self.text_areas.addTab(text_area('tab_1',p=self),'Tab 1')
-        self.text_areas.addTab(text_area('tab_2',p=self),'Tab 2')
+        self.text_areas.addTab(window_widget(text_area('tab_1',p=self)),'Tab 1')
+        self.text_areas.addTab(window_widget(text_area('tab_2',p=self)),'Tab 2')
         self.setMouseTracking(True)
     def closeEvent(self,a):
         inst=QApplication.instance()
         for x in inst.allWidgets():
             if isinstance(x,QDialog):
                 x.reject()
-    def mouseMoveEvent(self,event):
-        inst=QApplication.instance()
-        for x in inst.allWidgets():
-            if isinstance(x,QWidget):
-                try:
-                    x.mouseMoved(event)
-                    print("MOUSE EVENT")
-                except Exception as err:
-                    pass
+    # def mouseMoveEvent(self,event):
+    #     inst=QApplication.instance()
+    #     for x in inst.allWidgets():
+    #         if isinstance(x,QWidget):
+    #             try:
+    #                 x.mouseMoved(event)
+    #             except Exception as err:
+    #                 pass
 app=QApplication(sys.argv)
 f=open("style.css","r")
 app.setStyleSheet(f.read())
