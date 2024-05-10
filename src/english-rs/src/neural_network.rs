@@ -47,6 +47,9 @@ pub struct neuron {
 	pub t_len: u16, // 65535 max
 	pub w_derivs: Vec<f32>,
 	pub b_deriv: f32,
+
+	pub w_train: Vec<Vec<f32>>,
+	pub b_train: Vec<f32>,
 }
 impl Default for neuron {
 	fn default() -> neuron {
@@ -60,6 +63,9 @@ impl Default for neuron {
 			t_len: 0,
 			w_derivs: vec![],
 			b_deriv: 0.0,
+
+			w_train: Vec![],
+			b_train: Vec![],
 		}
 	}
 }
@@ -67,10 +73,16 @@ impl Default for neuron {
 impl neuron{
 	pub fn f_prop(mut self,pre_layer: Vec<f32>) {
 		self.value = self.bias;
-		for i in 0..self.t_len {
+		for i in 0..self.pre_layer.len() {
 			self.value += pre_layer[i as usize] * self.weights[i as usize];
 		}
 		self.value = (self.activation)(self.value);
+	}
+	pub fn pre_train(mut self) {
+		self.w_train.clear();
+		self.b_train.clear();
+		self.w_train.push(self.weights.clone());
+		self.b_train.push(self.bias);
 	}
 }
 
@@ -106,6 +118,13 @@ pub mod net {
 				model.push(c_layer);
 			}
 			return model;
+		}
+		pub fn run_network(mut self,input: Vec<f32>) -> Vec<f32> {
+			for layer in 1..self.shape.len() {
+				for n in 0..self.shape[layer] {
+					self.model[layer][n].f_prop(self.model[layer-1].iter().map(|m| m.value).collect());
+				}
+			}
 		}
 	}
 }

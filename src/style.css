@@ -21,13 +21,21 @@ QWidget {
 	border: none;
 }
 QTextEdit#text_box {
-	background-color: #3C3C3C;
+/*	background-color: #3C3C3C;*/
+/*	color: #FFFFFF;*/
+    background: rgba(255,255,255,0);
+	border: none;
 }
 QLabel#e {
 	background-color: rgb(255,0,0);
 	border: 5px solid #FF0000;
 	color: #F00;
 	position: fixed;
+}
+QLabel#back_suggestbox {
+	position: absolute;
+	vertical-align: top;
+	text-align: left;
 }
 /*QTabWidget::pane {
 	border: 0px;

@@ -1,3 +1,4 @@
+# By: Evern McCullough
 import numpy as np
 import sys,os
 from PyQt5.QtCore import *
@@ -64,18 +65,35 @@ class text_box(QTextEdit):
 class text_area(QWidget):
     def __init__(self,name="text_area",p=None):
         super().__init__()
-        self.layout=QVBoxLayout()
+        self.layout=QStackedLayout()
+        self.layout.setStackingMode(QStackedLayout.StackAll)
         self.layout.setContentsMargins(0,0,0,0)
         self.setObjectName("test LABEL")
         self.setLayout(self.layout)
+        self.back_suggestbox=QTextEdit()
+        #self.back_suggestbox.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
+        self.back_suggestbox.setObjectName("back_suggestbox")
+        self.back_suggestbox.setReadOnly(True)
+        self.back_suggestbox.setText(" ")
         self.text_box=text_box()
+        self.text_box.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
         self.text_box.cursorPositionChanged.connect(self.move_c)
-        self.cursorBox=suggestion_area(p=p)
+        #self.text_box.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
+        # self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
+        self.layout.addWidget(self.back_suggestbox)
+        #self.layout.setCurrentIndex(0)
+        self.stop=0
         self.p=p
+    def resizeEvent(self,event):
+        if self.stop<=0:
+            self.stop=2
+            #self.back_suggestbox.setFixedSize(self.text_box.size().width(),self.text_box.size().height())
+        else:
+            self.stop-=1
     def mouseMoved(self,event):
         print(self.text_box.textCursor().document())
-        self.cursorBox.setVisible(False)
+        # self.cursorBox.setVisible(False)
     def move_c(self):
         # print(self.text_box.cursorRect())
         WPos=(0,0)
@@ -85,12 +103,13 @@ class text_area(QWidget):
             if isinstance(x,QMainWindow):
                 WindApp=x
                 WPos=(x.pos().x(),x.pos().y())
-            if isinstance(x, text_area) and x!=self:
-                x.cursorBox.setVisible(False)
-        self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
-        self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
-        self.cursorBox.show()
-        self.cursorBox.UpdateText(self.text_box.toPlainText())
+            # if isinstance(x, text_area) and x!=self:
+            #     x.cursorBox.setVisible(False)
+        # self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
+        # self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
+        # self.cursorBox.show()
+        # self.cursorBox.UpdateText(self.text_box.toPlainText())
+        self.back_suggestbox.setText(self.text_box.toPlainText()+" hi")
         WindApp.activateWindow()
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
@@ -157,8 +176,8 @@ class GUI(QMainWindow):
         self.text_areas=QTabWidget()
         self.text_areas.setObjectName("text_areas")
         self.layout.addWidget(self.text_areas)
-        self.text_areas.addTab(window_widget(text_area('tab_1',p=self)),'Tab 1')
-        self.text_areas.addTab(window_widget(text_area('tab_2',p=self)),'Tab 2')
+        self.text_areas.addTab((text_area('tab_1',p=self)),'Tab 1')
+        self.text_areas.addTab((text_area('tab_2',p=self)),'Tab 2')
         self.setMouseTracking(True)
     def closeEvent(self,a):
         inst=QApplication.instance()
