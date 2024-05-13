@@ -37,6 +37,13 @@ QLabel#back_suggestbox {
 	vertical-align: top;
 	text-align: left;
 }
+QDockWidget {
+	border: none;
+}
+QDockWidget::title {
+	border: none;
+	background-color: #505050;
+}
 /*QTabWidget::pane {
 	border: 0px;
 }*/

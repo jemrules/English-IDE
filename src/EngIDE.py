@@ -26,14 +26,26 @@ def css_txt(text,css):
     return "<span style='{css}'>{txt}</span>".format(css=css,txt=escape(text))
 
 class window_widget(QDockWidget):
-    def __init__(self,p=None):
+    def __init__(self,Widget,Title,Closeable=True,Detachable=True,p=None):
         super().__init__()
-        # self.setObjectName("WindowWidget")
-        self.setWindowTitle('Window Widget')
+        self.setObjectName("DockWidget")
+        self.setWindowTitle(Title)
         self.setWidget(QWidget())
         self.layout=QVBoxLayout()
         self.widget().setLayout(self.layout)
+        self.child=Widget
+        if not Closeable:
+            self.setFeatures(QDockWidget.DockWidgetClosable)
+        if not Detachable:
+            self.setFeatures(QDockWidget.DockWidgetFloatable)
+        try:
+            Widget.parent=self
+        except:
+            pass
+        self.layout.addWidget(self.child)
         # self.layout.addWidget(QLabel('Window Widget'))
+    def getChild(self):
+        return self.child
 class text_box(QTextEdit):
     def __init__(self,p=None):
         super().__init__()
@@ -63,8 +75,14 @@ class text_box(QTextEdit):
         self.update_text()
 
 class text_area(QWidget):
-    def __init__(self,name="text_area",p=None):
+    def __init__(self,name="text_area",path=None,saved=False,p=None):
         super().__init__()
+        self.path=path
+        self.saved=saved
+        self.parent=p
+
+        p.setTabText(p.indexOf(self),name)
+
         self.layout=QStackedLayout()
         self.layout.setStackingMode(QStackedLayout.StackAll)
         self.layout.setContentsMargins(0,0,0,0)
@@ -79,12 +97,11 @@ class text_area(QWidget):
         self.text_box.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
         self.text_box.cursorPositionChanged.connect(self.move_c)
         #self.text_box.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
-        # self.cursorBox=suggestion_area(p=p)
+        self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
         self.layout.addWidget(self.back_suggestbox)
         #self.layout.setCurrentIndex(0)
         self.stop=0
-        self.p=p
     def resizeEvent(self,event):
         if self.stop<=0:
             self.stop=2
@@ -93,7 +110,7 @@ class text_area(QWidget):
             self.stop-=1
     def mouseMoved(self,event):
         print(self.text_box.textCursor().document())
-        # self.cursorBox.setVisible(False)
+        self.cursorBox.setVisible(False)
     def move_c(self):
         # print(self.text_box.cursorRect())
         WPos=(0,0)
@@ -103,13 +120,13 @@ class text_area(QWidget):
             if isinstance(x,QMainWindow):
                 WindApp=x
                 WPos=(x.pos().x(),x.pos().y())
-            # if isinstance(x, text_area) and x!=self:
-            #     x.cursorBox.setVisible(False)
-        # self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
-        # self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
-        # self.cursorBox.show()
-        # self.cursorBox.UpdateText(self.text_box.toPlainText())
-        self.back_suggestbox.setText(self.text_box.toPlainText()+" hi")
+            if isinstance(x, text_area) and x!=self:
+                x.cursorBox.setVisible(False)
+        self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
+        self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
+        self.cursorBox.show()
+        self.cursorBox.UpdateText(self.text_box.toPlainText())
+        #self.back_suggestbox.setText(self.text_box.toPlainText())
         WindApp.activateWindow()
     #     self.text_box.cursorPositionChanged.connect(self.move_c)
     # def move_c(self):
@@ -169,15 +186,24 @@ class GUI(QMainWindow):
     def initUI(self):
         self.setWindowTitle('GUI')
         self.setGeometry(100, 100, 800, 600)
-        self.setCentralWidget(QWidget())
+        self.text_areas=QTabWidget()
+        self.setCentralWidget(self.text_areas)
         self.setObjectName("GUI")
+
+        self.mb=self.menuBar()
+        self.fileMB=QMenu("&file",self)
+        file=self.mb.addMenu("File")
+
+        file.addAction("New")
+        file.addAction("Open")
+        file.addAction("Save")
+        file.addAction("Save As")
+
         self.layout=QVBoxLayout()
         self.centralWidget().setLayout(self.layout)
-        self.text_areas=QTabWidget()
         self.text_areas.setObjectName("text_areas")
-        self.layout.addWidget(self.text_areas)
-        self.text_areas.addTab((text_area('tab_1',p=self)),'Tab 1')
-        self.text_areas.addTab((text_area('tab_2',p=self)),'Tab 2')
+        self.text_areas.addTab((text_area('Blank Program 2',p=self.text_areas)),'Blank Program')
+        self.addDockWidget(Qt.RightDockWidgetArea,window_widget(QLabel("hello"),"Test"))
         self.setMouseTracking(True)
     def closeEvent(self,a):
         inst=QApplication.instance()

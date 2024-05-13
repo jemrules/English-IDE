@@ -81,7 +81,7 @@ impl neuron{
 	pub fn pre_train(mut self) {
 		self.w_train.clear();
 		self.b_train.clear();
-		self.w_train.push(self.weights.clone());
+		self.w_train.append(self.weights.clone());
 		self.b_train.push(self.bias);
 	}
 }
@@ -125,6 +125,7 @@ pub mod net {
 					self.model[layer][n].f_prop(self.model[layer-1].iter().map(|m| m.value).collect());
 				}
 			}
+			return self.model[self.shape.len()-1].iter().map(|m| m.value).collect();
 		}
 	}
 }
