@@ -4,7 +4,7 @@ import platform as pl
 
 oskey={"windows":"win","darwin":"macos"}
 
-streamline=False
+streamline=True
 
 print("Installing requirements...")
 f=open('requirements.txt', 'r')

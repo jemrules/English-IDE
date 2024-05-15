@@ -203,7 +203,6 @@ class GUI(QMainWindow):
         self.centralWidget().setLayout(self.layout)
         self.text_areas.setObjectName("text_areas")
         self.text_areas.addTab((text_area('Blank Program 2',p=self.text_areas)),'Blank Program')
-        self.addDockWidget(Qt.RightDockWidgetArea,window_widget(QLabel("hello"),"Test"))
         self.setMouseTracking(True)
     def closeEvent(self,a):
         inst=QApplication.instance()
