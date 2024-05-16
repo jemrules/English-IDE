@@ -6,20 +6,23 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
-from english_rs.english_rs import autocorrect, compare_words, autocomplete
 import threading
 import pynput,keyboard
-# rust=False
-# try:
-#     import english_rs as Ers
-#     rust=True
-# except ImportError:
-#     rust=False
-#     print("Rust end not compiled!")
+rust=False
+try:
+    from english_rs.english_rs import autocorrect, compare_words, autocomplete
+    rust=True
+except ImportError:
+    rust=False
+    print("Rust end is not up to date or not installed on this system.")
+    print("To fix this you will need to run InstallPackages.py with the -r flag.")
+    print("This will require you to install Rust and Cargo on your system.")
+    print("   For windows run: python InstallPackages.py -r")
+    print("   For linux run: python3 InstallPackages.py -r")
+    print("If you have any issues please refer to the README.md file.")
+    exit()
 
 # https://www.sketchengine.eu/english-word-list/
-
-print("\n".join([str(y) for y in compare_words("hello","hello")]))
 
 def rgb_txt(text,rgb):
     return "<span style='color:rgb({R},{G},{B})'>{txt}</span>".format(R=rgb[0],G=rgb[1],B=rgb[2],txt=escape(text))
@@ -104,6 +107,7 @@ class text_area(QWidget):
         self.text_box=text_box(p=self)
         self.text_box.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
         self.text_box.cursorPositionChanged.connect(self.move_c)
+        self.text_box.textChanged.connect(self.updated_text)
         #self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
         self.layout.addWidget(self.back_suggestbox)
@@ -115,7 +119,7 @@ class text_area(QWidget):
         self.stop=0
         keyboard.hook(self.global_keypress)
     def mouseMoved(self,event):
-        print(self.text_box.textCursor().document())
+        return
         #self.cursorBox.setVisible(False)
     def KReleaseEvent(self,event):
         if event.key()==Qt.Key_Control:
@@ -130,18 +134,17 @@ class text_area(QWidget):
     def global_keypress(self,event):
         if not self.text_box.hasFocus():
             return
-        print(event.name)
         if event.event_type==keyboard.KEY_DOWN and event.name=="tab":
             self.focusNextPrevChild(False)
         if not self.shift and event.event_type==keyboard.KEY_DOWN and event.name=="tab":
             self.text_box.insertPlainText(self.AC)
         elif self.shift and event.event_type==keyboard.KEY_DOWN and event.name=="tab":
             self.text_box.insertPlainText(" "*4)
-
-    def move_c(self):
-        # print(self.text_box.cursorRect())
+    def updated_text(self):
         self.saved=False
         self.parent.setTabText(self.parent.indexOf(self),self.name+("*" if not self.saved else ""))
+    def move_c(self):
+        # print(self.text_box.cursorRect())
         WPos=(0,0)
         WindApp=None
         inst=QApplication.instance()
@@ -230,6 +233,7 @@ class GUI(QMainWindow):
         self.actNew.setShortcut("Ctrl+N")
         self.actOpen=file.addAction("Open")
         self.actOpen.setShortcut("Ctrl+O")
+        self.actOpen.triggered.connect(self.openFile)
         self.actSave=file.addAction("Save")
         self.actSave.setShortcut("Ctrl+S")
         self.actSaveAs=file.addAction("Save As")
@@ -253,17 +257,15 @@ class GUI(QMainWindow):
         self.mouseListener.start()
         self.text_areas.tabBarClicked.connect(self.MMoveEvent)
     def on_click(self,x,y,button,pressed):
-        print(button)
         if button==pynput.mouse.Button.left:
             self.mouse[0]=pressed
         if button==pynput.mouse.Button.middle:
             self.mouse[1]=pressed
         if button==pynput.mouse.Button.right:
             self.mouse[2]=pressed
-        print(self.mouse)
     def MMoveEvent(self,event):
         if self.mouse[1]:
-            self.text_areas.removeTab(self.text_areas.currentIndex())
+            self.text_areas.removeTab(event)
 
     def saveAs(self):
         self.text_areas.currentWidget().path=QFileDialog.getSaveFileName(self,"Save File","./","Text Files (*.txt)")[0]
@@ -275,13 +277,24 @@ class GUI(QMainWindow):
         self.text_areas.currentWidget().saved=True
         self.text_areas.setTabText(self.text_areas.currentIndex(),self.text_areas.currentWidget().name)
         self.actSave.setEnabled(True)
-
     def save(self):
         with open(self.text_areas.currentWidget().path,"w") as f:
             f.write(self.text_areas.currentWidget().text_box.toPlainText())
         self.text_areas.currentWidget().name=self.text_areas.currentWidget().path.split("/")[-1]
         self.text_areas.currentWidget().saved=True
         self.text_areas.setTabText(self.text_areas.currentIndex(),self.text_areas.currentWidget().name)
+
+    def openFile(self):
+        self.text_areas.addTab((text_area('untitled',p=self.text_areas)),'untitled')
+        self.text_areas.currentWidget().path=QFileDialog.getOpenFileName(self,"Open File","./","Text Files (*.txt)")[0]
+        if self.text_areas.currentWidget().path=="":
+            return
+        with open(self.text_areas.currentWidget().path,"r") as f:
+            self.text_areas.currentWidget().text_box.setText(f.read())
+        self.text_areas.currentWidget().name=self.text_areas.currentWidget().path.split("/")[-1]
+        self.text_areas.currentWidget().saved=True
+        self.text_areas.setTabText(self.text_areas.currentIndex(),self.text_areas.currentWidget().name)
+        self.actSave.setEnabled(True)
     def closeEvent(self,a):
         inst=QApplication.instance()
         for x in inst.allWidgets():

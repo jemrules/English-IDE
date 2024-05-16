@@ -5,6 +5,10 @@ import platform as pl
 oskey={"windows":"win","darwin":"macos"}
 
 streamline=False
+if len(sys.argv)>1:
+    if sys.argv[1]=="-r" or sys.argv[1]=="--rust":
+        streamline=True
+        print("Rust installation...")
 
 print("Installing requirements...")
 f=open('requirements.txt', 'r')
