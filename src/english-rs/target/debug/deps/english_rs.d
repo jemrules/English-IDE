@@ -1,5 +1,5 @@
-/Users/9621955/AdvancedComputerProgramming/Semester2/EnglishIDE/English-IDE/src/english-rs/target/debug/deps/libenglish_rs.dylib: src/lib.rs
+E:\English-IDE\English-IDE\src\english-rs\target\debug\deps\english_rs.dll: src\lib.rs
 
-/Users/9621955/AdvancedComputerProgramming/Semester2/EnglishIDE/English-IDE/src/english-rs/target/debug/deps/english_rs.d: src/lib.rs
+E:\English-IDE\English-IDE\src\english-rs\target\debug\deps\english_rs.d: src\lib.rs
 
-src/lib.rs:
+src\lib.rs:

@@ -32,10 +32,8 @@ QLabel#e {
 	color: #F00;
 	position: fixed;
 }
-QLabel#back_suggestbox {
-	position: absolute;
-	vertical-align: top;
-	text-align: left;
+QTextEdit#back_suggestbox {
+	color: rgb(127,127,127);
 }
 QDockWidget {
 	border: none;
@@ -43,6 +41,16 @@ QDockWidget {
 QDockWidget::title {
 	border: none;
 	background-color: #505050;
+	color: #FFFFFF;
+}
+QMenu::item:selected:enabled {
+	background-color: #FF5000;
+}
+QMenu::item:disabled {
+	color: rgba(127, 127, 127, 1.0);
+}
+QMenuBar::item:selected {
+	background-color: #FF5000;
 }
 /*QTabWidget::pane {
 	border: 0px;

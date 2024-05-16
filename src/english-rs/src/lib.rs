@@ -77,7 +77,10 @@ fn compare_words(word1: String,word2: String) -> PyResult<Vec<Vec<i16>>> {
 fn autocomplete(subword: String,max_size: i16) -> PyResult<Vec<String>> {
     let contents = fs::read_to_string("word_data/wordbank.txt")
         .expect("Unable to open Word Bank (word_data/wordbank.txt) file");
-    let valid_words=contents.lines().filter(|a| a.starts_with(&subword)).map(|a| a.split(";").collect::<Vec<&str>>()[0].to_string()).collect();
+    let mut valid_words: Vec<String>=contents.lines().filter(|a| a.starts_with(&subword)).map(|a| a.split(";").collect::<Vec<&str>>()[0].to_string()).collect();
+    if valid_words.len()==0 {
+        valid_words=vec![" ".to_string()];
+    }
     match max_size {
         -1 => Ok(valid_words),
         _ => Ok(valid_words[0..min(max_size as usize,valid_words.len())].to_vec())

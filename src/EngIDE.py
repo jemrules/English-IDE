@@ -6,8 +6,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
-from english_rs.english_rs import autocorrect, compare_words
+from english_rs.english_rs import autocorrect, compare_words, autocomplete
 import threading
+import pynput,keyboard
 # rust=False
 # try:
 #     import english_rs as Ers
@@ -49,6 +50,7 @@ class window_widget(QDockWidget):
 class text_box(QTextEdit):
     def __init__(self,p=None):
         super().__init__()
+        self.p=p
         self.setAcceptRichText(False)
         self.setObjectName("text_box")
         self.textChanged.connect(self.update_text)
@@ -57,6 +59,12 @@ class text_box(QTextEdit):
         self.currentPos=1
         self.last=""
         self.setLineWrapMode(QTextEdit.NoWrap)
+    def keyPressEvent(self,event):
+        self.p.KPressEvent(event)
+        super().keyPressEvent(event)
+    def keyReleaseEvent(self,event):
+        self.p.KReleaseEvent(event)
+        super().keyReleaseEvent(event)
     def update_text(self):
         if self.disableChange>0:
             self.disableChange-=1
@@ -80,8 +88,9 @@ class text_area(QWidget):
         self.path=path
         self.saved=saved
         self.parent=p
+        self.name=name
 
-        p.setTabText(p.indexOf(self),name)
+        p.setTabText(p.indexOf(self),name+("*" if not saved else ""))
 
         self.layout=QStackedLayout()
         self.layout.setStackingMode(QStackedLayout.StackAll)
@@ -89,30 +98,50 @@ class text_area(QWidget):
         self.setObjectName("test LABEL")
         self.setLayout(self.layout)
         self.back_suggestbox=QTextEdit()
-        #self.back_suggestbox.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
         self.back_suggestbox.setObjectName("back_suggestbox")
         self.back_suggestbox.setReadOnly(True)
         self.back_suggestbox.setText(" ")
-        self.text_box=text_box()
+        self.text_box=text_box(p=self)
         self.text_box.setGeometry(0,0,self.sizeHint().width(),self.sizeHint().height())
         self.text_box.cursorPositionChanged.connect(self.move_c)
-        #self.text_box.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
-        self.cursorBox=suggestion_area(p=p)
+        #self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
         self.layout.addWidget(self.back_suggestbox)
+        self.ctrl=False
+        self.shift=False
+        self.AC=""
+        self.text_box.setTabChangesFocus(True)
         #self.layout.setCurrentIndex(0)
         self.stop=0
-    def resizeEvent(self,event):
-        if self.stop<=0:
-            self.stop=2
-            #self.back_suggestbox.setFixedSize(self.text_box.size().width(),self.text_box.size().height())
-        else:
-            self.stop-=1
+        keyboard.hook(self.global_keypress)
     def mouseMoved(self,event):
         print(self.text_box.textCursor().document())
-        self.cursorBox.setVisible(False)
+        #self.cursorBox.setVisible(False)
+    def KReleaseEvent(self,event):
+        if event.key()==Qt.Key_Control:
+            self.ctrl=False
+        if event.key()==Qt.Key_Shift:
+            self.shift=False
+    def KPressEvent(self,event):
+        if event.key()==Qt.Key_Control:
+            self.ctrl=True
+        if event.key()==Qt.Key_Shift:
+            self.shift=True
+    def global_keypress(self,event):
+        if not self.text_box.hasFocus():
+            return
+        print(event.name)
+        if event.event_type==keyboard.KEY_DOWN and event.name=="tab":
+            self.focusNextPrevChild(False)
+        if not self.shift and event.event_type==keyboard.KEY_DOWN and event.name=="tab":
+            self.text_box.insertPlainText(self.AC)
+        elif self.shift and event.event_type==keyboard.KEY_DOWN and event.name=="tab":
+            self.text_box.insertPlainText(" "*4)
+
     def move_c(self):
         # print(self.text_box.cursorRect())
+        self.saved=False
+        self.parent.setTabText(self.parent.indexOf(self),self.name+("*" if not self.saved else ""))
         WPos=(0,0)
         WindApp=None
         inst=QApplication.instance()
@@ -120,25 +149,33 @@ class text_area(QWidget):
             if isinstance(x,QMainWindow):
                 WindApp=x
                 WPos=(x.pos().x(),x.pos().y())
-            if isinstance(x, text_area) and x!=self:
-                x.cursorBox.setVisible(False)
-        self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
-        self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
-        self.cursorBox.show()
-        self.cursorBox.UpdateText(self.text_box.toPlainText())
-        #self.back_suggestbox.setText(self.text_box.toPlainText())
+            # if isinstance(x, text_area) and x!=self:
+            #     x.cursorBox.setVisible(False)
+        #self.cursorBox.setGeometry(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10,115,56)
+        #self.cursorBox.move(self.text_box.cursorRect().x()+WPos[0]+20,self.text_box.cursorRect().y()+WPos[1]+self.sizeHint().height()//2-10)
+        #self.cursorBox.show()
+        #self.cursorBox.UpdateText(self.text_box.toPlainText())
+
+        temp=autocomplete(self.text_box.toPlainText().split(" ")[-1],5)
+        Max=0
+        Big=" "
+        for x in temp:
+            if len(x)>Max:
+                Max=len(x)
+                Big=x
+        self.AC=Big
+        try:
+            self.AC=self.AC[self.text_box.toPlainText().split(" ")[-1].__len__():]
+        except:
+            pass
+        self.back_suggestbox.setText(self.text_box.toPlainText()+" "+self.AC)
         WindApp.activateWindow()
-    #     self.text_box.cursorPositionChanged.connect(self.move_c)
-    # def move_c(self):
-    #     self.setFixedSize(200,500)
-    #     self.move(50,500)
 
 class suggestion_area(QDialog):
     def __init__(self,p=None):
         super().__init__()
         self.setObjectName("suggestion_area")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.NonModal)
-        #self.setWindowFlags()
         self.layout=QVBoxLayout()
         self.Label=QLabel("Suggestions")
         self.layout.addWidget(self.Label)
@@ -154,11 +191,8 @@ class suggestion_area(QDialog):
         self.lastWord=""
         self.setLayout(self.layout)
     def ACTh(self,x):
-        #print("in",x)
         self.suggestions=autocorrect(x)
     def UpdateText(self,txt):
-        #print("--",self.size().width(),self.size().height())
-        #print(txt)
         self.txt=txt.lower()
         if len(txt.split())>0:
             if not self.ACThread.is_alive() and self.lastWord!=txt.split()[len(txt.split())-1]:
@@ -166,9 +200,6 @@ class suggestion_area(QDialog):
                 self.ACThread = threading.Thread(target=self.ACTh, args=(self.txt.split()[len(txt.split())-1],))
                 self.ACThread.start()
                 self.lastWord=txt.split()[len(self.txt.split())-1]
-            #print(self.suggestions[:20],self.lastWord==self.txt.split()[len(txt.split())-1])
-            #print(txt.split()[len(txt.split())-1])
-            #print(suggestions)
             minimum=0
             maximum=0
             for x in self.suggestions[:20]:
@@ -176,8 +207,8 @@ class suggestion_area(QDialog):
                     maximum=x[1]
                 if x[1]<minimum:
                     minimum=x[1]
-            maximum-=minimum
-            self.Label.setText("<br/>".join([rgb_txt(("> " if x[1]/maximum<=0.5 else "")+str(x[0]),(255*x[1]/maximum*0.8,255,255*x[1]/maximum*0.8)) for x in self.suggestions[:20] if x[1]/maximum<=0.75]))
+            maximum-=minimum#("> " if x[1]/maximum<=0.5 else "")+
+            self.Label.setText("<br/>".join([rgb_txt(str(x[0]),(255*x[1]/maximum*0.8,255,255*x[1]/maximum*0.8)) for x in self.suggestions[:20] if x[1]/maximum<=0.75]))
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -194,16 +225,63 @@ class GUI(QMainWindow):
         self.fileMB=QMenu("&file",self)
         file=self.mb.addMenu("File")
 
-        file.addAction("New")
-        file.addAction("Open")
-        file.addAction("Save")
-        file.addAction("Save As")
+        self.actNew=file.addAction("New")
+        self.actNew.triggered.connect(lambda: self.text_areas.addTab((text_area('untitled',p=self.text_areas)),'untitled'))
+        self.actNew.setShortcut("Ctrl+N")
+        self.actOpen=file.addAction("Open")
+        self.actOpen.setShortcut("Ctrl+O")
+        self.actSave=file.addAction("Save")
+        self.actSave.setShortcut("Ctrl+S")
+        self.actSaveAs=file.addAction("Save As")
+        self.actSaveAs.setShortcut("Ctrl+Shift+S")
+        self.actSaveAs.triggered.connect(self.saveAs)
+        self.actClose=file.addAction("Close")
+        self.actClose.setShortcut("Ctrl+W")
+        self.actClose.triggered.connect(lambda : (self.text_areas.removeTab(self.text_areas.currentIndex()),self.closeEvent("")))
 
+        self.actSave.triggered.connect(self.save)
+
+        self.actSave.setDisabled(True)
+        
         self.layout=QVBoxLayout()
         self.centralWidget().setLayout(self.layout)
         self.text_areas.setObjectName("text_areas")
-        self.text_areas.addTab((text_area('Blank Program 2',p=self.text_areas)),'Blank Program')
+        self.text_areas.addTab((text_area('untitled',p=self.text_areas)),'untitled')
         self.setMouseTracking(True)
+        self.mouse=[False,False,False]
+        self.mouseListener=pynput.mouse.Listener(on_click=self.on_click)
+        self.mouseListener.start()
+        self.text_areas.tabBarClicked.connect(self.MMoveEvent)
+    def on_click(self,x,y,button,pressed):
+        print(button)
+        if button==pynput.mouse.Button.left:
+            self.mouse[0]=pressed
+        if button==pynput.mouse.Button.middle:
+            self.mouse[1]=pressed
+        if button==pynput.mouse.Button.right:
+            self.mouse[2]=pressed
+        print(self.mouse)
+    def MMoveEvent(self,event):
+        if self.mouse[1]:
+            self.text_areas.removeTab(self.text_areas.currentIndex())
+
+    def saveAs(self):
+        self.text_areas.currentWidget().path=QFileDialog.getSaveFileName(self,"Save File","./","Text Files (*.txt)")[0]
+        if self.text_areas.currentWidget().path=="":
+            return
+        with open(self.text_areas.currentWidget().path,"w") as f:
+            f.write(self.text_areas.currentWidget().text_box.toPlainText())
+        self.text_areas.currentWidget().name=self.text_areas.currentWidget().path.split("/")[-1]
+        self.text_areas.currentWidget().saved=True
+        self.text_areas.setTabText(self.text_areas.currentIndex(),self.text_areas.currentWidget().name)
+        self.actSave.setEnabled(True)
+
+    def save(self):
+        with open(self.text_areas.currentWidget().path,"w") as f:
+            f.write(self.text_areas.currentWidget().text_box.toPlainText())
+        self.text_areas.currentWidget().name=self.text_areas.currentWidget().path.split("/")[-1]
+        self.text_areas.currentWidget().saved=True
+        self.text_areas.setTabText(self.text_areas.currentIndex(),self.text_areas.currentWidget().name)
     def closeEvent(self,a):
         inst=QApplication.instance()
         for x in inst.allWidgets():
