@@ -8,6 +8,7 @@ from html import escape
 from syntax_handle import colorize
 import threading
 import pynput,keyboard
+import re
 rust=False
 try:
     from english_rs.english_rs import autocorrect, compare_words, autocomplete
@@ -53,6 +54,7 @@ class window_widget(QDockWidget):
 class text_box(QTextEdit):
     def __init__(self,p=None):
         super().__init__()
+        self.setUndoRedoEnabled(True)
         self.p=p
         self.setAcceptRichText(False)
         self.setObjectName("text_box")
@@ -61,7 +63,7 @@ class text_box(QTextEdit):
         self.disableChange=0
         self.currentPos=1
         self.last=""
-        self.setLineWrapMode(QTextEdit.NoWrap)
+        #self.setLineWrapMode(QTextEdit.NoWrap)
     def keyPressEvent(self,event):
         self.p.KPressEvent(event)
         super().keyPressEvent(event)
@@ -110,6 +112,7 @@ class text_area(QWidget):
         self.text_box.textChanged.connect(self.updated_text)
         #self.cursorBox=suggestion_area(p=p)
         self.layout.addWidget(self.text_box)
+        #self.layout.addWidget(self.wordCounter)
         self.layout.addWidget(self.back_suggestbox)
         self.ctrl=False
         self.shift=False
@@ -143,6 +146,7 @@ class text_area(QWidget):
     def updated_text(self):
         self.saved=False
         self.parent.setTabText(self.parent.indexOf(self),self.name+("*" if not self.saved else ""))
+        #self.wordCounter.setText("Word Count: "+str(len(self.text_box.toPlainText().split())))
     def move_c(self):
         # print(self.text_box.cursorRect())
         WPos=(0,0)
@@ -212,13 +216,22 @@ class suggestion_area(QDialog):
                     minimum=x[1]
             maximum-=minimum#("> " if x[1]/maximum<=0.5 else "")+
             self.Label.setText("<br/>".join([rgb_txt(str(x[0]),(255*x[1]/maximum*0.8,255,255*x[1]/maximum*0.8)) for x in self.suggestions[:20] if x[1]/maximum<=0.75]))
+class data_window(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.layout=QVBoxLayout()
+        self.setLayout(self.layout)
+        self.textArea=QLabel("Word Count: 0")
+        self.layout.addWidget(self.textArea)
+    def update_word_count(self,txt):
+        self.textArea.setText("Sentence Count: "+str(re.split("[.!?]", txt).__len__())+"\nWord Count: "+str(txt.split(" ").__len__())+"\nChar Count: "+str(txt.__len__()))
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('GUI')
+        self.setWindowTitle('English IDE')
         self.setGeometry(100, 100, 800, 600)
         self.text_areas=QTabWidget()
         self.setCentralWidget(self.text_areas)
@@ -250,7 +263,13 @@ class GUI(QMainWindow):
         self.layout=QVBoxLayout()
         self.centralWidget().setLayout(self.layout)
         self.text_areas.setObjectName("text_areas")
-        self.text_areas.addTab((text_area('untitled',p=self.text_areas)),'untitled')
+        self.text_areas.addTab(text_area('untitled',p=self.text_areas),'untitled')
+
+        self.dwindow=data_window()
+        self.addDockWidget(Qt.BottomDockWidgetArea,window_widget(self.dwindow,"Data Window",Closeable=True,Detachable=True,p=self))
+        
+        self.text_areas.currentWidget().text_box.textChanged.connect(lambda: self.dwindow.update_word_count(self.text_areas.currentWidget().text_box.toPlainText()))
+
         self.setMouseTracking(True)
         self.mouse=[False,False,False]
         self.mouseListener=pynput.mouse.Listener(on_click=self.on_click)
