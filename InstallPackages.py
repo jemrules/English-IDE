@@ -19,6 +19,7 @@ if sys.platform == 'win32':
     os.system('pip install -r requirements.txt')
     print("INSTALLING RUST END")
     if streamline==True:
+        print("COMPILING RUST END")
         os.system("cd src\\english-rs\\ && maturin build")
         os.system("cd ..\\..\\")
         os.system(f'pip uninstall english-rs -y')

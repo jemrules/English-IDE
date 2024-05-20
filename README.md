@@ -22,6 +22,16 @@ pip install src\english-rs\target\wheels\english_rs-0.1.0-cp37-none-win_amd64.wh
 ```
 2. Use what every method you would like to **open "EngIDE.py"**
 
+## How to compile for other platforms
+_You will need to have rust already installed, and be on the target machine._
+Run [InstallPackages.py](https://github.com/jemrules/English-IDE/blob/Windows/InstallPackages.py) with args -r OR --rust
+```bash
+python InstallPackages.py -r
+python3 InstallPackages.py --rust
+
+# Run using
+python -u src/EngIDE.py
+```
 
 #### Credits
  - **dwyl** for the word list that I use for the auto-correct. [Link to dwyl's word lists](https://github.com/dwyl/english-words/tree/master)
