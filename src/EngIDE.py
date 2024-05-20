@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from html import escape
 from syntax_handle import colorize
 import threading
-import pynput,keyboard
+import pynput, keyboard
 import re
 rust=False
 try:

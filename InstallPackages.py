@@ -16,8 +16,7 @@ for line in f:
     print(" ".join(line.replace("==","=").split('=')))
 f.close()
 if sys.platform == 'win32':
-    if not streamline:
-        os.system('pip install -r requirements.txt')
+    os.system('pip install -r requirements.txt')
     print("INSTALLING RUST END")
     if streamline==True:
         os.system("cd src\\english-rs\\ && maturin build")
