@@ -1,0 +1,1 @@
+Hello, world! This is English IDE. A IDE for english. As you can see it colors text based on parts of speech. Like Nouns (person), verbs (running), and adjectives (they have blue eyes). It can even auto

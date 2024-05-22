@@ -33,6 +33,9 @@ python3 InstallPackages.py --rust
 # Run using
 python -u src/EngIDE.py
 ```
+#### Example of English IDE running
+![Test Screenshot](https://raw.githubusercontent.com/jemrules/English-IDE/main/readmeAssets/Test.png)
+
 
 #### Credits
  - **dwyl** for the word list that I use for the auto-correct. [Link to dwyl's word lists](https://github.com/dwyl/english-words/tree/master)
