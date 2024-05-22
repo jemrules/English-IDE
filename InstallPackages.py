@@ -30,6 +30,7 @@ else:
     dirs=os.listdir("src/english-rs/target/wheels/")
     fName=[x for x in dirs if x.__contains__(oskey[pl.system().lower()])][0]
     if streamline==True:
+        print("COMPILING RUST END")
         os.system("cd src/english-rs/ && python3 -m maturin build")
         os.system("cd ../../")
         os.system(f'pip3 uninstall english-rs -y')

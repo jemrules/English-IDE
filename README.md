@@ -9,6 +9,7 @@ English IDE is just like a programming IDE, but it gives you grammer errors and 
 - We use **maturin** to make Rust programs into python packages.
 
 ## How to run
+_Look at "How to compile for other platforms" if you want to use on linux_
 1. Install Packages by running **InstallPackages.py**. Alternatively you can manually install by running:
 ```bash
 # For macOS
@@ -20,7 +21,7 @@ pip3 install src/english-rs/target/wheels/english_rs-0.1.0-cp310-cp310-macosx_11
 pip install -r requirements.txt
 pip install src\english-rs\target\wheels\english_rs-0.1.0-cp37-none-win_amd64.whl
 ```
-2. Use what every method you would like to **open "EngIDE.py"**
+2. Open *EnglishIDE for Mac* OR *EnglishIDE.exe for Windows*
 
 ## How to compile for other platforms
 _You will need to have rust already installed, and be on the target machine._
