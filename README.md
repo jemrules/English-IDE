@@ -33,7 +33,7 @@ python3 InstallPackages.py --rust
 # Run using
 python -u src/EngIDE.py
 ```
-#### Example of English IDE running
+### Example of English IDE running
 ![Test Screenshot](https://raw.githubusercontent.com/jemrules/English-IDE/main/readmeAssets/Test.png)
 
 
